@@ -15,12 +15,12 @@ Output: false
 
 /*
 这道题目还是用dp的思路来做。
-首先需要一个二维数组，横轴和纵轴分别是 s1 length+1 和 s2 length+1。
+首先需要一个二维boolean数组，横轴和纵轴分别是 s1.length+1 和 s2.length+1。
 因为最后是要返回一个boolean, 所以 table[][] 是一个二维的boolean数组。
-table[i][j] 指的是 s1.charAt(i-1) 和s2.charAt(j-1）到这一步可不可以组合成
-s3.substring(0,i+j)。可不可以要看s1和s2在i和j上的char 是否和s3在(i+j-1)
-上的char 是一样的。如果s1.charAt(i-1)== s3.charAat(i+j-1)。那么我们要
-查找在
+table[i][j] 指的是 s1到第i-1位 和s2到第j-1位可不可以组合成
+s3的前i+j位。判断的条件是s1的第i-1或者s2的第j-1位是否和s3的第i+j位一样。
+我们只需要知道目前 s1和s2遍历到了哪一位就知道s3应该遍历到哪一位了，因为
+最后s3 = s1+s2，长度是一直相等的
 
 举个例子
 Given:
@@ -42,6 +42,8 @@ a 5[F  F  F  F  T  T]
 
  time : O(m * n)
  space : O(m * n)
+
+九章算法中有详细讲解，第五课
 */
 
 class Solution {
@@ -71,5 +73,37 @@ class Solution {
             }
         }
         return table[m][n];
+    }
+}
+
+
+
+class Solution {
+    public boolean isInterleave(String s1, String s2, String s3) {
+        char[] str1 = s1.toCharArray();
+        char[] str2 = s2.toCharArray();
+        char[] str3 = s3.toCharArray();
+        int m = str1.length;
+        int n = str2.length;
+        if((m+n) != s3.length()) return false;
+        boolean[][] dp = new boolean[m+1][n+1];
+        dp[0][0] = true;
+        
+        
+        for(int i=0; i<=m; i++){
+            for(int j=0; j<=n; j++){
+
+                if(i>0 && str1[i-1] == str3[i+j-1]){
+                    dp[i][j] |= dp[i-1][j];
+                }
+                
+                if(j>0 && str2[j-1] == str3[i+j-1]){
+                    dp[i][j] |= dp[i][j-1];
+                }
+            }
+        }
+    
+        
+        return dp[m][n];
     }
 }
