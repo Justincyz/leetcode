@@ -26,8 +26,8 @@ Output: ["eat","oath"]
 /*
 两个关键步骤，
 (1)用Trie Tree结构储存要查找的单词
-(2) DFS + BackTracking查找matrix中每一个字母。用字母作为root在Trie中看是否有可以reach
-的单词
+(2)DFS + BackTracking查找matrix中每一个字母(注意是对每一个位置都做DFS)。
+用字母作为root在Trie中看是否有可以reach的单词
 */
 
 class Solution {
