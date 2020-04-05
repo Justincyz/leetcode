@@ -66,3 +66,74 @@ class Solution {
         return inorderRes;
     }
 }
+
+/*
+在这里我们还有一种做法，就是大名鼎鼎的Morris Traversal, 这样时间复杂度还是O(N)，
+但是空间复杂度降为了O(1)
+"引用"
+在介绍这种方法之前，我们先来引入一种新型树，叫 Threaded binary 
+tree(https://en.wikipedia.org/wiki/Threaded_binary_tree)，这个还不太好翻译，
+我第一眼看上去以为是叫线程二叉树，但是感觉好像又跟线程没啥关系，后来看到网上有人翻
+译为螺纹二叉树，但本人认为这翻译也不太敢直视，很容易让人联想到为计划生育做出突出贡献
+的某世界著名品牌，但是苦于找不到更合理的翻译方法，就暂且叫螺纹二叉树吧。我们先来看看
+维基百科上关于它的英文定义：
+
+A binary tree is threaded by making all right child pointers that would 
+normally be null point to the inorder successor of the node (if it exists), 
+and all left child pointers that would normally be null point to the inorder
+ predecessor of the node.
+
+就是说螺纹二叉树实际上是把所有原本为空的右子节点指向了中序遍历顺序之后的那个节点，
+把所有原本为空的左子节点都指向了中序遍历之前的那个节点，具体例子可以点击这里。那么这
+道题跟这个螺纹二叉树又有啥关系呢？由于我们既不能用递归，又不能用栈，那我们如何保证访
+问顺序是中序遍历的左-根-右呢。原来我们需要构建一个螺纹二叉树，需要将所有为空的右子节
+点指向中序遍历的下一个节点，这样中序遍历完左子结点后，就能顺利的回到其根节点继续遍
+历了。具体算法如下：
+
+1. 初始化指针 cur 指向 root
+2. 当 cur 不为空时
+　 - 如果 cur 没有左子结点
+　    a) 打印出 cur 的值
+　　  b) 将 cur 指针指向其右子节点
+　 - 反之
+　    将 pre 指针指向 cur 的左子树中的最右子节点　
+　　　  * 若 pre 不存在右子节点
+　　　      a) 将其右子节点指回 cur
+　　　　    b) cur 指向其左子节点
+　　　  * 反之
+　　　　　 a) 将 pre 的右子节点置空
+　　　　　 b) 打印 cur 的值
+　　　　　 c) 将 cur 指针指向其右子节点
+*/
+//C++的写法
+class Solution {
+public:
+    vector<int> inorderTraversal(TreeNode *root) {
+        vector<int> res;
+        if (!root) return res;
+        TreeNode *cur, *pre;
+        cur = root;
+        while (cur) {
+            if (!cur->left) {
+                res.push_back(cur->val);
+                cur = cur->right;
+            } else {
+                pre = cur->left;
+                while (pre->right && pre->right != cur) pre = pre->right;
+                if (!pre->right) {
+                    pre->right = cur;
+                    cur = cur->left;
+                } else {
+                    pre->right = NULL;
+                    res.push_back(cur->val);
+                    cur = cur->right;
+                }
+            }
+        }
+        return res;
+    }
+};
+
+/*
+其实 Morris 遍历不仅仅对中序遍历有用，对先序和后序同样有用，具体可参见网友 NOALGO 博客，和 Annie Kim's Blog 的博客。所以对二叉树的三种常见遍历顺序(先序，中序，后序)就有三种解法(递归，非递归，Morris 遍历)，总共有九段代码呀，熟练掌握这九种写法才算初步掌握了树的遍历
+*/
